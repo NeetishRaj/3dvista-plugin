@@ -4,6 +4,7 @@ For any custom plugins or features on 3D Vista contact : [Neetish](https://www.l
 
 Check out the slider demo [here](https://660001f4691180c62b4a4b1a--glittery-nougat-763154.netlify.app/) 
 
+![alt text](image-1.png)
 
 ![alt text](image.png)
 
