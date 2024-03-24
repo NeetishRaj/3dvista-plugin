@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Joystick Control</title>
+  </head>
+  <body>
+
+    <script>
+      const CustomSlider = (function () {
+        console.log("Initialised Custom Slider");
+        const HIGH_FRAME_SPEED = 10;
+        const LOW_FRAME_SPEED = 0;
+
+        // The code that will run on slider value change will run here.
+        let slider_running = false;
+        let current_frame_speed = 0;
+        let interval;
+
+        function slider_funtion() {
+          // console.log(`FRAME SPEED: ${current_frame_speed}m INTERVAL: ${interval}`);
+
+          if(typeof tour === "undefined") {
+            console.log("Custom Slider Error: Cannot access current tour!");
+            return null;
+          }
+
+          if(current_frame_speed < 0) {
+            // console.log("PREV");
+            tour._getRootPlayer().MainViewerPhotoAlbumPlayer.previous()
+          } else if (current_frame_speed > 0){
+            // console.log("NEXT");
+            tour._getRootPlayer().MainViewerPhotoAlbumPlayer.next()
+          }
+        }
+
+        const joystick = document.createElement("DIV");
+        const handle = document.createElement("DIV");
+        joystick.setAttribute("id", "custom_slider");
+        joystick.setAttribute("id", "custom_slider_handle");
+        joystick.appendChild(handle);
+        document.body.appendChild(joystick);
+
+        joystick.style.cssText = "position: fixed;top: 90vh;left: calc(50% - (25vw/2));z-index: 10;width: 25vw;height: 20px;background-color: rgba(200,200,200,0.4);border-radius: 40px;position: relative;cursor: pointer;";
+
+        handle.style.cssText = "width: 30px;height: 30px;background-color: rgba(50,50,50,0.6);border-radius: 50%; position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%)";
+
+        // Variables to store joystick position
+        let joystickX = 0;
+
+        // Event listeners for joystick movement
+        handle.addEventListener("mousedown", startDrag);
+        handle.addEventListener("touchstart", startDrag);
+
+        function startDrag(e) {
+          e.preventDefault();
+          joystick.addEventListener("mousemove", moveHandle);
+          joystick.addEventListener("touchmove", moveHandle);
+          joystick.addEventListener("mouseup", endDrag);
+          joystick.addEventListener("mouseleave", endDrag);
+          joystick.addEventListener("touchend", endDrag);
+        }
+
+        function moveHandle(e) {
+          let mouseX;
+          if (e.type === "mousemove") {
+            mouseX = e.clientX;
+          } else if (e.type === "touchmove") {
+            mouseX = e.touches[0].clientX;
+          }
+
+          const rect = joystick.getBoundingClientRect();
+          const joystickLeft = rect.left;
+          const joystickRight = rect.right;
+          const joystickWidth = rect.width;
+
+          if (mouseX > joystickRight) joystickX = joystickRight;
+          else if (mouseX < joystickLeft) joystickX = joystickLeft;
+          else joystickX = mouseX;
+
+          // Update handle position
+          const new_pos = joystickX - joystickLeft;
+          handle.style.left = new_pos + "px";
+
+          // Normalize joystick position between -HIGH_FRAME_SPEED/2 and +HIGH_FRAME_SPEED/2
+          current_frame_speed = Math.floor((new_pos / joystickWidth) * HIGH_FRAME_SPEED) - HIGH_FRAME_SPEED / 2;
+
+          // console.log("current_frame_speed:", current_frame_speed);
+
+          // start slider
+          clearInterval(interval)
+          if(current_frame_speed !== 0){
+            interval = setInterval(slider_funtion, 1000 / Math.abs(current_frame_speed))
+          }
+        }
+
+        function endDrag() {
+          joystick.removeEventListener("mousemove", moveHandle);
+          joystick.removeEventListener("touchmove", moveHandle);
+          joystick.removeEventListener("mouseup", endDrag);
+          joystick.removeEventListener("touchend", endDrag);
+
+          // Reset handle position
+          handle.style.left = "50%";
+          joystickX = 0;
+          current_frame_speed = 0;
+          clearInterval(interval);
+        }
+      })();
+    </script>
+  </body>
+</html>
